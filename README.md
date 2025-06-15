@@ -1,141 +1,143 @@
-```
-# Pizza Restaurant API 
+```markdown
+# Pizza API 
 
-A RESTful API for managing pizza restaurants, their menus, and pizza offerings, built with Flask and PostgreSQL.
+## Setup
 
-## Features
-
-- RESTful endpoints for restaurants, pizzas, and their relationships
-- Proper database relationships using SQLAlchemy
-- Serialization with SQLAlchemy-serializer
-- Flask-Migrate for database migrations
-- Proper MVC architecture
-
-## Tech Stack
-
-- **Backend**: Python, Flask
-- **Database**: PostgreSQL
-- **ORM**: SQLAlchemy
-- **Migrations**: Flask-Migrate
-- **Serialization**: SQLAlchemy-serializer
-
-## Setup Instructions
-
-### Prerequisites
-
-- Python 3.11+
-- PostgreSQL 12+
-- pipenv (recommended)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/pizza-restaurant-api.git
-   cd pizza-restaurant-api
-   ```
-
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
-   ```
-
-3. Install dependencies:
-   ```bash
-   pipenv install
-   pipenv shell
-   ```
-
-4. Set up database:
-   ```bash
-   # Create your PostgreSQL database first
-   createdb pizza_restaurant
-
-   # Initialize migrations
-   export FLASK_APP=server:create_app
-   flask db init
-   flask db migrate -m "Initial migration"
-   flask db upgrade
-   ```
-
-5. Seed sample data:
-   ```bash
-   python -m server.seed
-   ```
-
-## Running the Application
-
+### 1. Install dependencies
 ```bash
-pipenv run flask run
+pipenv install
+pipenv shell
 ```
 
-The API will be available at `http://localhost:5000`
+### 2. Database Setup
+```bash
+# Create PostgreSQL database
+createdb pizza_restaurant
+
+# Initialize migrations
+export FLASK_APP=server:create_app
+flask db init
+flask db migrate -m "Initial tables"
+flask db upgrade
+```
+
+### 3. Seed Sample Data
+```bash
+python -m server.seed
+```
+
+### 4. Run the Server
+```bash
+flask run
+```
 
 ## API Endpoints
 
 ### Restaurants
-- `GET /api/restaurants` - List all restaurants
-- `GET /api/restaurants/<id>` - Get restaurant details
-- `DELETE /api/restaurants/<id>` - Delete a restaurant
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/restaurants` | Get all restaurants |
+| GET | `/api/restaurants/<int:id>` | Get single restaurant |
+| DELETE | `/api/restaurants/<int:id>` | Delete restaurant |
 
 ### Pizzas
-- `GET /api/pizzas` - List all pizzas
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/pizzas` | Get all pizzas |
 
 ### Restaurant Pizzas
-- `POST /api/restaurant_pizzas` - Create a pizza association
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/restaurant_pizzas` | Create pizza association |
 
-## Project Structure
+## Example Requests
 
-```
-.
-├── server/
-│   ├── __init__.py       # App factory
-│   ├── app.py            # Main app entry
-│   ├── config.py         # Configuration
-│   ├── models/           # Database models
-│   │   ├── pizza.py
-│   │   ├── restaurant.py
-│   │   └── restaurant_pizza.py
-│   ├── controllers/      # Route handlers
-│   │   ├── pizza_controller.py
-│   │   ├── restaurant_controller.py
-│   │   └── restaurant_pizza_controller.py
-│   └── seed.py          # Database seeder
-├── migrations/          # Database migrations
-├── .env.example         # Environment template
-├── Pipfile              # Dependencies
-└── README.md            # This file
-```
-
-## Testing
-
-Run the test suite with:
+### Get all restaurants
 ```bash
-pipenv run pytest
+curl http://localhost:5000/api/restaurants
+```
+Response:
+```json
+[
+  {
+    "id": 1,
+    "name": "Pizza Palace",
+    "address": "123 Main St"
+  }
+]
 ```
 
-## Deployment
+### Create restaurant pizza
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "price": 15,
+  "pizza_id": 1,
+  "restaurant_id": 3
+}' http://localhost:5000/api/restaurant_pizzas
+```
+Success Response (201):
+```json
+{
+  "id": 4,
+  "pizza": {
+    "id": 1,
+    "ingredients": "Tomato sauce, Mozzarella, Basil",
+    "name": "Margherita"
+  },
+  "price": 15,
+  "restaurant": {
+    "address": "789 Pine Rd",
+    "id": 3,
+    "name": "Slice of Heaven"
+  },
+  "restaurant_id": 3
+}
+```
 
-For production deployment, consider:
+## Validation Rules
 
-1. Using Gunicorn:
-   ```bash
-   pipenv install gunicorn
-   gunicorn "server:create_app()" -w 4 -b :5000
-   ```
+### RestaurantPizza
+- `price`: Must be between 1-30 (inclusive)
+- `pizza_id`: Must reference existing pizza
+- `restaurant_id`: Must reference existing restaurant
 
-2. Setting up proper production environment variables:
-   ```bash
-   FLASK_ENV=production
-   SECRET_KEY=your-production-secret
-   DATABASE_URL=postgresql://produser:prodpass@prod-host/prod-db
-   ```
+Error Response (400):
+```json
+{
+  "errors": ["Price must be between 1 and 30"]
+}
+```
 
-## Contributing
+## Postman Setup
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+1. Import the collection:
+   - Click "Import" in Postman
+   - Select `challenge-1-pizzas.postman_collection.json`
+
+2. Environment variables:
+   - Create new environment called "Pizza API"
+   - Add variable `base_url` with value `http://localhost:5000`
+
+3. Available requests:
+   - GET All Restaurants
+   - POST Create Restaurant Pizza
+   - DELETE Restaurant
+
+## Database Schema
+
+### Restaurants
+- `id` (Integer, PK)
+- `name` (String, unique)
+- `address` (String)
+
+### Pizzas
+- `id` (Integer, PK)
+- `name` (String)
+- `ingredients` (String)
+
+### RestaurantPizzas
+- `id` (Integer, PK)
+- `price` (Integer)
+- `pizza_id` (Integer, FK)
+- `restaurant_id` (Integer, FK)
+```
