@@ -1,0 +1,69 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv/
+Pipfile
+Pipfile.lock
+pythonenv/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Logs and local development files
+*.log
+logs/
+*.pot
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# SQLAlchemy migration versions (if not tracking migrations)
+/migrations/versions/
+
+# PostgreSQL specific
+postgres-data/
+pgdata/
+*.pid
+*.lock
+
+# Python packaging
+*.egg-info/
+*.egg
+dist/
+build/
