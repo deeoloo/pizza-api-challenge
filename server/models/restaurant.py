@@ -13,4 +13,4 @@ class Restaurant(db.Model, SerializerMixin):
     serialize_rules = ('-restaurant_pizzas.restaurant',)
 
     def __repr__(self):
-        return f"<Restaurant {self.id}: {self.name}>"
+        return f"<Restaurant {self.id}: {self.name} {self.address}>"
